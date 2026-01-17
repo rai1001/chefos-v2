@@ -20,6 +20,17 @@ const LINE_IDS = [
   '77777777-0000-0000-0000-000000000202',
   '77777777-0000-0000-0000-000000000203'
 ]
+const LOCATION_IDS = [
+  '88888888-0000-0000-0000-000000000001',
+  '88888888-0000-0000-0000-000000000002'
+]
+const BATCH_IDS = [
+  '88888888-0000-0000-0000-000000000010',
+  '88888888-0000-0000-0000-000000000011',
+  '88888888-0000-0000-0000-000000000012',
+  '88888888-0000-0000-0000-000000000013'
+]
+const RULE_ID = '88888888-0000-0000-0000-000000000020'
 
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false }
@@ -131,7 +142,7 @@ async function seed() {
           total_estimated: 96.5
         }
       ],
-      { onConflict: 'id' }
+      { onConflict: 'id', ignoreDuplicates: true }
     ),
     'purchase_orders'
   )
@@ -173,6 +184,70 @@ async function seed() {
       { onConflict: 'id' }
     ),
     'purchase_order_lines'
+  )
+
+  await ensure(
+    await supabaseAdmin.from('inventory_locations').upsert(
+      [
+        { id: LOCATION_IDS[0], org_id: ORG_ID, hotel_id: HOTEL_ID, name: 'Almacen Central', is_default: true },
+        { id: LOCATION_IDS[1], org_id: ORG_ID, hotel_id: HOTEL_ID, name: 'Camara Fria', is_default: false }
+      ],
+      { onConflict: 'id' }
+    ),
+    'inventory_locations'
+  )
+
+  await ensure(
+    await supabaseAdmin.from('stock_batches').upsert(
+      [
+        {
+          id: BATCH_IDS[0],
+          org_id: ORG_ID,
+          location_id: LOCATION_IDS[0],
+          supplier_item_id: '77777777-0000-0000-0000-000000000011',
+          qty_on_hand: 20,
+          expires_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+          source: 'purchase'
+        },
+        {
+          id: BATCH_IDS[1],
+          org_id: ORG_ID,
+          location_id: LOCATION_IDS[0],
+          supplier_item_id: '77777777-0000-0000-0000-000000000012',
+          qty_on_hand: 10,
+          expires_at: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+          source: 'purchase'
+        },
+        {
+          id: BATCH_IDS[2],
+          org_id: ORG_ID,
+          location_id: LOCATION_IDS[1],
+          supplier_item_id: '77777777-0000-0000-0000-000000000013',
+          qty_on_hand: 6,
+          expires_at: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+          source: 'purchase'
+        },
+        {
+          id: BATCH_IDS[3],
+          org_id: ORG_ID,
+          location_id: LOCATION_IDS[1],
+          supplier_item_id: '77777777-0000-0000-0000-000000000013',
+          qty_on_hand: 4,
+          expires_at: null,
+          source: 'prep'
+        }
+      ],
+      { onConflict: 'id' }
+    ),
+    'stock_batches'
+  )
+
+  await ensure(
+    await supabaseAdmin.from('expiry_rules').upsert(
+      [{ id: RULE_ID, org_id: ORG_ID, threshold_days: 7, severity: 'warning', is_active: true }],
+      { onConflict: 'id' }
+    ),
+    'expiry_rules'
   )
 
   console.log('Seeded base data for E2E')

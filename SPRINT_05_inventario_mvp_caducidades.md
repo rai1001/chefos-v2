@@ -22,60 +22,60 @@ Entregar un **Inventario usable**: ubicaciones/almacenes, lotes con FEFO (first-
 ---
 
 ## Checklist corto (alineado con docs/MASTER_PLAN.md)
-- [ ] Migraciones: locations + batches + rules/alerts.
-- [ ] RLS: políticas por tabla (lectura/escritura) y tests.
-- [ ] UI básica: tabla de inventario con filtros y badges de caducidad.
-- [ ] Tests: DB (RLS + FEFO), unit/integration, E2E smoke.
-- [ ] Docs: inventario actualizado en `docs/inventory`.
+- [x] Migraciones: locations + batches + rules/alerts.
+- [x] RLS: políticas por tabla (lectura/escritura) y tests.
+- [x] UI básica: tabla de inventario con filtros y badges de caducidad.
+- [x] Tests: DB (RLS + FEFO), unit/integration, E2E smoke.
+- [x] Docs: inventario actualizado en `docs/inventory`.
 
 ---
 
 ## Tareas técnicas
 
 ### DB
-- [ ] Crear tablas (mínimo):
+- [x] Crear tablas (mínimo):
   - `inventory_locations` (org_id, hotel_id, name, is_default)
   - `stock_batches` (org_id, location_id, supplier_item_id, qty_on_hand, expires_at NULLable, source)
   - `expiry_rules` (org_id, threshold_days, severity, is_active)
   - `expiry_alerts` (org_id, batch_id, rule_id, severity, status, dedupe_key)
-- [ ] Decisión clave (seguir DECISIONS):
+- [x] Decisión clave (seguir DECISIONS):
   - `supplier_items` es el “producto” comprable; **no** crear tabla `products` nueva si no es necesaria.
   - FEFO ordena por `expires_at` (NULL al final).
-- [ ] Job/RPC protegido para generar alertas:
+- [x] Job/RPC protegido para generar alertas:
   - deduplica por (batch_id + rule_id + ventana)
   - no modifica stock, solo crea/actualiza `expiry_alerts`
-- [ ] Seeds idempotentes:
+- [x] Seeds idempotentes:
   - 2 locations
   - 4 batches (incluyendo uno sin `expires_at`)
   - 1 regla de caducidad
-- [ ] Tests pgTAP:
+- [x] Tests pgTAP:
   - RLS: otra org no ve batches/alerts
   - FEFO: orden correcto (expires_at asc, NULL last)
   - Dedupe: no duplica alertas si se re-ejecuta el job
 
 ### UI (Inventory)
-- [ ] `/inventory`:
+- [x] `/inventory`:
   - InventoryTable con columnas: Item, Ubicación, On hand, Expires, Estado (OK/Pronto/Crítico)
   - Filtros: ubicación + estado caducidad
   - Acciones MVP: “Descartar alerta” (solo cambia estado de alert, no stock)
   - Estados: loading/empty/error coherentes
 
 ### Auth / permisos
-- [ ] Roles:
+- [x] Roles:
   - Chef/Kitchen: lectura + descartar alertas
   - Purchasing: lectura
   - Admin: todo
 
 ### Tests
-- [ ] Unit:
+- [x] Unit:
   - lógica de “estado de caducidad” (mapping días→badge)
-- [ ] Integration:
+- [x] Integration:
   - adapter listInventory (batches + join a supplier_items + alerts)
-- [ ] E2E:
+- [x] E2E:
   - Login → /inventory → ver tabla y filtrar
 
 ### Docs / inventory
-- [ ] `docs/inventory/050_sprint05.md`:
+- [x] `docs/inventory/050_sprint05.md`:
   - modelo de datos inventario
   - job/RPC de alertas (inputs/outputs)
   - capturas de UI

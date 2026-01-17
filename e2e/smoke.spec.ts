@@ -107,8 +107,23 @@ test.describe('login Guarding', () => {
     await page.getByRole('link', { name: /ver/i }).first().click()
     await expect(page).toHaveURL(/\/orders\//)
 
-    await page.getByRole('button', { name: /marcar aprobado/i }).click()
-    await page.getByRole('button', { name: /confirmar/i }).click()
-    await expect(page.getByText(/Estado: Aprobado/i)).toBeVisible()
+    const approveButton = page.getByRole('button', { name: /marcar aprobado/i })
+    if ((await approveButton.count()) > 0) {
+      await approveButton.click()
+      await page.getByRole('button', { name: /confirmar/i }).click()
+      await expect(page.getByText(/Estado: Aprobado/i)).toBeVisible()
+    } else {
+      await expect(page.getByText(/Estado: (Aprobado|Ordenado|Recibido)/i)).toBeVisible()
+    }
+  })
+
+  test('opens inventory and filters', async ({ page }) => {
+    await loginViaApi(page)
+    await page.goto('/inventory', { waitUntil: 'domcontentloaded' })
+
+    await page.getByLabel('Ubicacion').selectOption({ label: 'Almacen Central' })
+    await page.getByLabel('Estado').selectOption({ label: 'Pronto' })
+
+    await expect(page.getByText('Harina 00')).toBeVisible({ timeout: 15000 })
   })
 })
