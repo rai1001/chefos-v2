@@ -20,6 +20,7 @@ test.describe('login Guarding', () => {
     await page.getByPlaceholder('••••••••').fill(TEST_PASSWORD)
     await page.getByRole('button', { name: /iniciar sesión/i }).click()
     await expect(page).toHaveURL(/\/dashboard/)
+    await expect(page.getByText(/KPIs de la semana/i)).toBeVisible()
   })
 
   test('logs out and lands back on login', async ({ page }) => {
