@@ -6,6 +6,7 @@ import { ReactNode, useMemo } from 'react'
 import { CommandPalette } from './CommandPalette'
 import { PageHeader } from './PageHeader'
 import { Banner } from './SkeletonGrid'
+import { useActiveOrg } from '@/modules/orgs/hooks/useActiveOrg'
 import { useAuth } from '@/providers'
 
 const NAV_ROUTES = [
@@ -28,6 +29,14 @@ export function AppShell({ title, description, actions, children }: AppShellProp
   const { session, signOut } = useAuth()
   const router = useRouter()
   const email = useMemo(() => session?.user?.email ?? 'Invitado', [session])
+  const {
+    orgName,
+    hotels,
+    activeHotelId,
+    setActiveHotelId,
+    loading: fetchingHotels,
+    error: orgError
+  } = useActiveOrg()
 
   async function handleSignOut() {
     await signOut()
@@ -51,10 +60,41 @@ export function AppShell({ title, description, actions, children }: AppShellProp
         </nav>
       </aside>
       <div className="flex flex-1 flex-col gap-0 bg-slate-950/40 p-6">
-        <header className="mb-6 flex items-center justify-between rounded-2xl border border-slate-900/60 bg-slate-900/70 px-6 py-4 shadow-lg shadow-black/20">
+        <header className="mb-6 flex flex-col gap-4 rounded-2xl border border-slate-900/60 bg-slate-900/70 px-6 py-4 shadow-lg shadow-black/20 md:flex-row md:items-center md:justify-between">
           <div>
             <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Org activa</p>
             <p className="text-sm text-slate-300">{email}</p>
+          </div>
+          <div className="flex flex-col gap-2 md:flex-row md:items-center">
+            <div className="text-xs uppercase tracking-[0.3em] text-slate-500">Hotel</div>
+            <div className="flex items-center gap-2 text-sm text-slate-300">
+              {fetchingHotels ? (
+                <span>Cargando hoteles…</span>
+              ) : orgError ? (
+                <span className="text-red-400">{orgError}</span>
+              ) : (
+                <select
+                  value={activeHotelId ?? ''}
+                  onChange={(event) => {
+                    const value = event.target.value
+                    if (value) {
+                      setActiveHotelId(value)
+                    }
+                  }}
+                  className="rounded-full border border-slate-800 bg-slate-950/40 px-3 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-white outline-none transition hover:border-slate-700"
+                >
+                  {hotels.length > 0 ? (
+                    hotels.map((hotel) => (
+                      <option className="bg-slate-950 text-sm text-white" key={hotel.id} value={hotel.id}>
+                        {hotel.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="">{orgName ?? 'Sin hoteles'}</option>
+                  )}
+                </select>
+              )}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <CommandPalette />

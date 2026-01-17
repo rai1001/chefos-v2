@@ -5,7 +5,10 @@ process.env.NEXT_PUBLIC_SUPABASE_URL ??= 'http://localhost:54321'
 process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??= 'anon-key'
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: vi.fn() })
+  useRouter: () => ({ push: vi.fn() }),
+  useSearchParams: () => ({
+    get: () => null
+  })
 }))
 
 const authMock = () => ({

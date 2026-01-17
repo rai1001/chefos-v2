@@ -23,3 +23,9 @@
 - Next.js sigue detectando `C:\Users\trabajo` como raíz por el `package-lock.json` fuera del repo; se puede resolver definiendo `turbopack.root` o eliminando ese lockfile si se controla el entorno local.
 - `docs/MASTER_PLAN.md` no existe, así que cerramos este sprint siguiendo el checklist de `SPRINT_00_cimientos.md`.
 - `npx supabase db reset --yes` aún falla porque el Storage API en `http://127.0.0.1:54331/storage/v1/bucket` rechaza la conexión tras el reinicio; hay que validar el contenedor Storage o poner reintentos en el CLI antes de marcar esa parte del checklist como completa.
+
+## Actualización 2026-01-17
+- Se sincronizan los tokens de Supabase (`sb-access-token`, `sb-refresh-token` y `sb-token-type`) con cookies de cliente desde `AuthProvider`, así el middleware puede leer la sesión y Playwright puede iniciar sesión sin caer en `/login?error=no-session`.
+- Se reforzaron los hooks de sesión: `useEffect` y `onAuthStateChange` ahora actualizan los cookies cada vez que cambia el `Session`, y `signOut` elimina los cookies para que se cierre la sesión desde la UI guardada.
+- Pruebas completas: `corepack pnpm test` y `corepack pnpm exec playwright test`.
+- Build de producción local: `corepack pnpm build` (con `NEXT_PUBLIC_SUPABASE_URL/ANON_KEY` y `SUPABASE_URL/SERVICE_ROLE_KEY` apuntando al Supabase local) pasa y genera las rutas `/`, `/dashboard`, `/events`, `/events/new`, `/inventory`, `/login`, `/orders`, `/settings`, `/staff` y `/_not-found`.
