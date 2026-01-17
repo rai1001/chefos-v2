@@ -6,7 +6,8 @@ export default defineConfig({
   expect: {
     timeout: 5_000
   },
-  fullyParallel: true,
+  fullyParallel: false,
+  workers: 1,
   use: {
     baseURL: 'http://127.0.0.1:3000',
     headless: true,
@@ -21,7 +22,8 @@ export default defineConfig({
     }
   ],
   webServer: {
-    command: 'node scripts/seed-auth.mjs && npx pnpm dev',
+    command:
+      'node scripts/seed-data.mjs && node scripts/seed-auth.mjs && node ./node_modules/next/dist/bin/next dev --hostname 127.0.0.1 --port 3000',
     port: 3000,
     reuseExistingServer: true,
     timeout: 120_000,

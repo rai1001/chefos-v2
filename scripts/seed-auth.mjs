@@ -16,34 +16,47 @@ const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false }
 })
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+
 async function ensureTestUser() {
-  const { data: listResult, error: listError } = await supabaseAdmin.auth.admin.listUsers({
-    perPage: 100
-  })
-  if (listError) {
-    throw listError
+  let lastError
+  for (let attempt = 1; attempt <= 5; attempt += 1) {
+    try {
+      const { data: listResult, error: listError } = await supabaseAdmin.auth.admin.listUsers({
+        perPage: 100
+      })
+      if (listError) throw listError
+
+      let user = listResult?.users?.find((candidate) => candidate.email === TEST_EMAIL)
+
+      if (!user) {
+        const { data, error } = await supabaseAdmin.auth.admin.createUser({
+          id: DEFAULT_USER_ID,
+          email: TEST_EMAIL,
+          password: TEST_PASSWORD,
+          email_confirm: true
+        })
+
+        if (error && error.status !== 409) throw error
+        user = data?.user ?? { id: DEFAULT_USER_ID }
+      }
+
+      await supabaseAdmin
+        .from('org_members')
+        .update({ user_id: user.id })
+        .eq('user_id', DEFAULT_USER_ID)
+
+      console.log(`Seeded auth user ${user.id} (${TEST_EMAIL})`)
+      return
+    } catch (error) {
+      lastError = error
+      if (attempt < 5) {
+        await sleep(1000 * attempt)
+      }
+    }
   }
 
-  let user = listResult?.users?.find((candidate) => candidate.email === TEST_EMAIL)
-
-  if (!user) {
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
-      id: DEFAULT_USER_ID,
-      email: TEST_EMAIL,
-      password: TEST_PASSWORD,
-      email_confirm: true
-    })
-
-    if (error) throw error
-    user = data.user
-  }
-
-  await supabaseAdmin
-    .from('org_members')
-    .update({ user_id: user.id })
-    .eq('user_id', DEFAULT_USER_ID)
-
-  console.log(`Seeded auth user ${user.id} (${TEST_EMAIL})`)
+  throw lastError
 }
 
 ensureTestUser().catch((error) => {

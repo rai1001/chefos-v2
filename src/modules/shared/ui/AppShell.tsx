@@ -69,7 +69,7 @@ export function AppShell({ title, description, actions, children }: AppShellProp
             <div className="text-xs uppercase tracking-[0.3em] text-slate-500">Hotel</div>
             <div className="flex items-center gap-2 text-sm text-slate-300">
               {fetchingHotels ? (
-                <span>Cargando hoteles…</span>
+                <span>Cargando hoteles...</span>
               ) : orgError ? (
                 <span className="text-red-400">{orgError}</span>
               ) : (
@@ -103,13 +103,13 @@ export function AppShell({ title, description, actions, children }: AppShellProp
               className="rounded-full border border-slate-700/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-200 transition hover:border-slate-500"
               onClick={handleSignOut}
             >
-              Cerrar sesión
+              Cerrar sesion
             </button>
           </div>
         </header>
         {title && (
           <div className="mb-4">
-            <Banner message="Navegación protegida por Supabase Auth" />
+            <Banner message="Navegacion protegida por Supabase Auth" />
           </div>
         )}
         {title && <PageHeader title={title} description={description} actions={actions} />}

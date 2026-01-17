@@ -10,7 +10,7 @@ describe('AppShell', () => {
       </AppShell>
     )
 
-    expect(screen.getByRole('button', { name: /Cerrar sesión/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Cerrar sesion/i })).toBeInTheDocument()
     expect(screen.getByTestId('child')).toBeInTheDocument()
   })
 })

@@ -1,12 +1,5 @@
-import { AppShell } from '@/modules/shared/ui/AppShell'
-import { PageHeader } from '@/modules/shared/ui/PageHeader'
-import { SkeletonGrid } from '@/modules/shared/ui/SkeletonGrid'
+import { PurchaseOrdersListView } from '@/modules/purchasing/ui/PurchaseOrdersListView'
 
 export default function OrdersPage() {
-  return (
-    <AppShell title="Pedidos">
-      <PageHeader title="Pedidos" description="Listado placeholder para órdenes" />
-      <SkeletonGrid />
-    </AppShell>
-  )
+  return <PurchaseOrdersListView />
 }

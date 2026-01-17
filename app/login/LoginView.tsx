@@ -18,9 +18,9 @@ export function LoginView() {
   const loginErrorMessage = useMemo(() => {
     if (!loginErrorReason) return null
     if (loginErrorReason === 'no-membership') {
-      return 'Tu cuenta no tiene una membresía activa. Contacta a un admin para obtener acceso.'
+      return 'Tu cuenta no tiene una membresia activa. Contacta a un admin para obtener acceso.'
     }
-    return 'Tu sesión expiró o es inválida. Inicia sesión nuevamente.'
+    return 'Tu sesion expiro o es invalida. Inicia sesion nuevamente.'
   }, [loginErrorReason])
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -42,7 +42,7 @@ export function LoginView() {
       <div className="w-full max-w-md rounded-3xl border border-slate-800/80 bg-slate-900/40 p-8 shadow-2xl shadow-slate-900/50 backdrop-blur">
         <h1 className="text-3xl font-semibold text-white">Bienvenido a ChefOS</h1>
         <p className="mt-2 text-sm text-slate-400">
-          Inicia sesión con Supabase Auth (usa las credenciales de prueba abajo) para acceder al AppShell.
+          Inicia sesion con Supabase Auth (usa las credenciales de prueba abajo) para acceder al AppShell.
         </p>
         {error && <Banner message={error} type="error" />}
         {loginErrorMessage && <Banner message={loginErrorMessage} />}
@@ -59,11 +59,11 @@ export function LoginView() {
             />
           </label>
           <label className="text-xs uppercase tracking-[0.2em] text-slate-500">
-            Contraseña
+            Contrasena
             <input
               className="mt-1 w-full rounded-lg border border-slate-700 bg-slate-950/50 px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-amber-500 focus:outline-none"
               type="password"
-              placeholder="••••••••"
+              placeholder="********"
               value={password}
               onChange={(event) => setPassword(event.target.value)}
               required
@@ -74,7 +74,7 @@ export function LoginView() {
             disabled={loading}
             className="w-full rounded-lg bg-amber-500 px-4 py-3 text-sm font-semibold uppercase tracking-widest text-slate-950 transition hover:bg-amber-400 disabled:opacity-50"
           >
-            {loading ? 'Verificando...' : 'Iniciar sesión'}
+            {loading ? 'Verificando...' : 'Iniciar sesion'}
           </button>
         </form>
         <p className="mt-4 text-center text-xs text-slate-400">
