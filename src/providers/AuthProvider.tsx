@@ -17,8 +17,6 @@ interface AuthContextValue {
   session: Session | null
   user: User | null
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>
-  signUp: (email: string, password: string) => Promise<{ error: Error | null }>
-  signInWithOtp: (email: string) => Promise<{ error: Error | null }>
   signOut: () => Promise<void>
 }
 
@@ -75,22 +73,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       signIn: async (email: string, password: string) => {
         const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password })
         syncAuthCookies(data.session ?? null)
-        return { error }
-      },
-      signUp: async (email: string, password: string) => {
-        const { data, error } = await supabaseClient.auth.signUp({ email, password })
-        if (data.session) {
-          syncAuthCookies(data.session)
-        }
-        return { error }
-      },
-      signInWithOtp: async (email: string) => {
-        const { error } = await supabaseClient.auth.signInWithOtp({
-          email,
-          options: {
-            emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined
-          }
-        })
         return { error }
       },
       signOut: async () => {
