@@ -6,6 +6,11 @@ const PUBLIC_PATHS = ['/login', '/favicon.ico', '/api/health']
 function redirectToLogin(request: NextRequest, reason?: string) {
   const loginUrl = request.nextUrl.clone()
   loginUrl.pathname = '/login'
+  // Preserve existing query params (important for magic links with 'code')
+  request.nextUrl.searchParams.forEach((value, key) => {
+    loginUrl.searchParams.set(key, value)
+  })
+
   loginUrl.searchParams.set('redirectedFrom', request.nextUrl.pathname)
   if (reason) {
     loginUrl.searchParams.set('error', reason)

@@ -78,7 +78,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return { error }
       },
       signUp: async (email: string, password: string) => {
-        const { data, error } = await supabaseClient.auth.signUp({ email, password })
+        const { data, error } = await supabaseClient.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined
+          }
+        })
         if (data.session) {
           syncAuthCookies(data.session)
         }
@@ -88,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const { error } = await supabaseClient.auth.signInWithOtp({
           email,
           options: {
-            emailRedirectTo: typeof window !== 'undefined' ? window.location.origin : undefined
+            emailRedirectTo: typeof window !== 'undefined' ? `${window.location.origin}/login` : undefined
           }
         })
         return { error }

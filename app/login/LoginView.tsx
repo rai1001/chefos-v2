@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, useEffect, useMemo, useState } from 'react'
 import { Banner } from '@/modules/shared/ui/SkeletonGrid'
 import { useAuth } from '@/providers/AuthProvider'
 
@@ -16,9 +16,17 @@ export function LoginView() {
   const [successMessage, setSuccessMessage] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
-  const { signIn, signUp, signInWithOtp } = useAuth()
+  const { session, signIn, signUp, signInWithOtp } = useAuth()
   const searchParams = useSearchParams()
   const loginErrorReason = searchParams.get('error')
+
+  // Auto-redirect if already logged in (e.g. from magic link)
+  useEffect(() => {
+    if (session) {
+      // Force full reload to sync cookies with server middleware
+      window.location.href = '/dashboard'
+    }
+  }, [session])
   const loginErrorMessage = useMemo(() => {
     if (!loginErrorReason) return null
     if (loginErrorReason === 'no-membership') {
