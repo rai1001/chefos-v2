@@ -8,10 +8,10 @@
 - Tests: pgTAP para RLS/estados; E2E smoke para staff y produccion.
 
 ## Pendientes del sprint (checklist)
-- [ ] Migraciones: shifts/time_off + production enhancements + shortages RPC.
-- [ ] RLS y pgTAP.
-- [ ] UI: /staff calendario 7 dias + tablero produccion.
-- [ ] Tests unit/integration/E2E.
+- [x] Migraciones: shifts/time_off + production enhancements + shortages RPC.
+- [x] RLS y pgTAP.
+- [x] UI: /staff calendario 7 dias + tablero produccion.
+- [x] Tests unit/integration/E2E.
 - [ ] Deploy/QA: checklist y runbook.
 - [ ] Documentacion final del sprint.
 
@@ -25,3 +25,11 @@
 - Variables obligatorias: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (solo server/seed).
 - Comandos smoke: `corepack pnpm test`, `npx supabase test db`, `corepack pnpm exec playwright test --reporter=list`.
 - Seguridad: sin service role en cliente; headers CSP/X-Frame-Options/X-Content-Type-Options pendientes.
+
+## Quick actions y UI
+- `/staff`: formularios de turnos y tiempo libre, badge de shortages.
+- `/dashboard`: tablero de produccion conectado a `production_tasks` y RPC de estado.
+- `/events`: acciones rapidas a staff/produccion.
+
+## Pendiente
+- Completar runbook QA/Deploy y checklist final (CSP, staging deploy).

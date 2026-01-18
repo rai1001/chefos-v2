@@ -16,12 +16,26 @@ export function EventListView() {
         title="Eventos"
         description="Gestiona eventos, espacios y servicios"
         actions={
-          <Link
-            href="/events/new"
-            className="rounded-full bg-amber-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-950"
-          >
-            Crear evento
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/events/new"
+              className="rounded-full bg-amber-500 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-950"
+            >
+              Crear evento
+            </Link>
+            <Link
+              href="/staff"
+              className="rounded-full border border-slate-700/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-200"
+            >
+              Ir a staff
+            </Link>
+            <Link
+              href="/dashboard#production"
+              className="rounded-full border border-slate-700/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-200"
+            >
+              Ver produccion
+            </Link>
+          </div>
         }
       />
 
