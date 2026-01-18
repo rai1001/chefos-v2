@@ -24,77 +24,77 @@ Implementar el flujo de **importación por OCR** (staging → validación → co
 ---
 
 ## Checklist corto (alineado con docs/MASTER_PLAN.md)
-- [ ] Migraciones: import_jobs/import_rows + menus templates/overrides + RPC `import_commit`.
-- [ ] RLS: staging y commit protegidos por `org_id`.
-- [ ] UI básica: ImporterPage con pasos y validaciones.
-- [ ] Tests: DB (RLS + commit), integration, E2E import smoke.
-- [ ] Docs: inventario del proceso OCR y variables de entorno.
+- [x] Migraciones: import_jobs/import_rows + menus templates/overrides + RPC `import_commit`.
+- [x] RLS: staging y commit protegidos por `org_id`.
+- [x] UI básica: ImporterPage con pasos y validaciones.
+- [x] Tests: DB (RLS + commit), integration, E2E import smoke.
+- [x] Docs: inventario del proceso OCR y variables de entorno.
 
 ---
 
 ## Tareas técnicas
 
 ### DB
-- [ ] Crear tablas staging:
+- [x] Crear tablas staging:
   - `import_jobs` (org_id, status, source, created_by)
   - `import_rows` (org_id, job_id, row_number, raw_json, errors_json, is_valid)
-- [ ] Crear tablas de menús (núcleo):
+- [x] Crear tablas de menús (núcleo):
   - `menu_templates` (org_id, name, version, payload_json)
   - `menu_overrides` (org_id, event_id, template_id, override_json)
   - (Opcional MVP) `ingredient_aliases` / `supplier_item_aliases` para mapeo.
-- [ ] RPC `import_commit`:
+- [x] RPC `import_commit`:
   - valida que el job pertenece a la org activa
   - solo permite commit si todas las filas críticas son válidas
   - escribe en tablas destino (proveedor/items/menús) de forma transaccional
-- [ ] Tests pgTAP:
+- [x] Tests pgTAP:
   - usuario de otra org no puede leer/escribir staging
   - `import_commit` falla si hay filas inválidas
   - `import_commit` no duplica si se re-ejecuta (idempotencia)
 
 ### Edge Functions (OCR)
-- [ ] Implementar función `ocr_process/enqueue` (y `run` si aplica):
+- [x] Implementar función `ocr_process/enqueue` (y `run` si aplica):
   - recibe attachment/job
   - llama a Gemini/IA y produce filas estructuradas
   - inserta en `import_rows`
-- [ ] Seguridad obligatoria (del CODE_REVIEW/ACTION_PLAN):
+- [x] Seguridad obligatoria (del CODE_REVIEW/ACTION_PLAN):
   - **Prohibido** hardcodear API keys: solo `GEMINI_API_KEY` via secrets
   - Añadir rate limiting por org (p.ej. 10 req/min)
   - Timeouts en llamadas a IA
   - Logging estructurado (sin `console.log` suelto)
 
 ### UI (Importer)
-- [ ] `ImporterPage` (wizard):
+- [x] `ImporterPage` (wizard):
   1) Subida de archivo
   2) OCR/scan (progreso)
   3) Validación de columnas/filas (tabla de errores)
   4) Confirmación y commit
-- [ ] UX:
+- [x] UX:
   - Estados vacíos claros
   - Error user-friendly (sin códigos PGRST crudos)
   - `ModalConfirm` antes de commit
 
 ### UI (Menús)
-- [ ] `/settings` MVP:
+- [x] `/settings` MVP:
   - Listar/crear `menu_templates`
   - Aplicar override a un evento (placeholder en UI si falta pantalla de evento avanzada)
 
 ### Auth / permisos
-- [ ] Roles:
+- [x] Roles:
   - Admin/Planner: pueden importar y commitear
   - Purchasing: puede importar items/proveedores
   - Viewer: solo lectura
 
 ### Tests
-- [ ] Unit:
+- [x] Unit:
   - validadores de columnas (supplier, productos, fechas)
   - normalización de filas OCR
-- [ ] Integration:
+- [x] Integration:
   - `import_commit` (happy path + invalid)
-- [ ] E2E:
+- [x] E2E:
   - Login → abrir importer → subir sample → ver staging → commit
 
 ### Docs / inventory
-- [ ] `docs/inventory/070_sprint07.md`:
+- [x] `docs/inventory/070_sprint07.md`:
   - variables de entorno y secrets (sin exponer valores)
   - diagrama corto del flujo OCR
   - endpoints y payloads

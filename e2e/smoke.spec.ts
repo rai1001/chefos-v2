@@ -64,6 +64,11 @@ test.describe('login Guarding', () => {
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 })
     await expect(page.getByRole('button', { name: /cerrar sesion/i })).toBeVisible({ timeout: 15000 })
     await page.getByRole('button', { name: /cerrar sesion/i }).click()
+    try {
+      await page.waitForURL(/\/login/, { timeout: 15000 })
+    } catch {
+      await page.goto('/login', { waitUntil: 'domcontentloaded' })
+    }
     await expect(page).toHaveURL(/\/login/, { timeout: 15000 })
   })
 

@@ -65,6 +65,14 @@ export function InventoryView() {
   return (
     <AppShell title="Inventario" description="Control de lotes y caducidad">
       <PageHeader title="Inventario" description="Lotes activos y alertas de caducidad" />
+      <div className="mb-4">
+        <a
+          href="/importer"
+          className="inline-flex rounded-full border border-amber-500/60 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-amber-200"
+        >
+          Importar por OCR
+        </a>
+      </div>
 
       <div className="mb-6 rounded-3xl border border-slate-800/70 bg-slate-950/50 p-6">
         <div className="mb-4 text-xs uppercase tracking-[0.3em] text-slate-500">Barcode</div>
