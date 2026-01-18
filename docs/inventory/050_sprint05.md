@@ -48,5 +48,6 @@
 
 ## Riesgos y mitigaciones
 - Supabase local: usar `npx supabase start --exclude vector` si hay conflicto de contenedor.
+- Supabase Studio: mantenemos el puerto 54325 para evitar choques con otros proyectos locales.
 - Turbopack: warning de `middleware` a `proxy` pendiente de migracion en sprint posterior.
 - UI: capturas pendientes hasta que el entorno tenga una ruta estable para exportarlas.
