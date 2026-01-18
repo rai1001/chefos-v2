@@ -1,7 +1,8 @@
 const securityHeaders = [
   {
     key: 'Content-Security-Policy',
-    value: "default-src 'self'; img-src 'self' data: https:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co";
+    value:
+      "default-src 'self'; img-src 'self' data: https:; script-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co"
   },
   {
     key: 'X-Frame-Options',
