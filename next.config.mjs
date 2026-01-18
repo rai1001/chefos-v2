@@ -2,7 +2,7 @@ const securityHeaders = [
   {
     key: 'Content-Security-Policy',
     value:
-      "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://vercel.live; frame-ancestors 'none';"
+      "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' https://vercel.live; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.supabase.co https://vercel.live; frame-src 'self' https://vercel.live; frame-ancestors 'none';"
   },
   {
     key: 'X-Frame-Options',
