@@ -62,8 +62,9 @@ test.describe('login Guarding', () => {
     await loginViaApi(page)
     await page.goto('/dashboard', { waitUntil: 'domcontentloaded' })
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 })
-    await expect(page.getByRole('button', { name: /cerrar sesion/i })).toBeVisible({ timeout: 15000 })
-    await page.getByRole('button', { name: /cerrar sesion/i }).click()
+    const logoutButtons = page.getByRole('button', { name: /cerrar sesion/i })
+    await expect(logoutButtons.first()).toBeVisible({ timeout: 15000 })
+    await logoutButtons.first().click()
     try {
       await page.waitForURL(/\/login/, { timeout: 15000 })
     } catch {
