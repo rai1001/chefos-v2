@@ -1,3 +1,4 @@
+import { getCookieValue } from '@/lib/helpers/cookies'
 import { supabaseClient } from '@/lib/supabase/client'
 import { getExpiryStatus } from '../domain/status'
 import type { InventoryBatch, ExpirySeverity, ExpiryStatus } from '../domain/types'
@@ -25,6 +26,23 @@ interface RuleRow {
 interface LocationRow {
   id: string
   name: string
+}
+
+interface BarcodeRow {
+  barcode: string
+  supplier_item_id: string
+  supplier_items?: { name: string } | { name: string }[] | null
+}
+
+interface SupplierItemRow {
+  id: string
+  name: string
+}
+
+export interface BarcodeLookupResult {
+  barcode: string
+  supplierItemId: string
+  supplierItemName: string
 }
 
 const resolveName = (value?: { name: string } | { name: string }[] | null) =>
@@ -113,6 +131,47 @@ export async function dismissAlertsForBatch(batchId: string): Promise<void> {
   if (error) throw new Error(error.message)
 }
 
+export async function lookupBarcode(barcode: string): Promise<BarcodeLookupResult | null> {
+  const trimmed = barcode.trim()
+  if (!trimmed) return null
+
+  const { data, error } = await supabaseClient
+    .from('product_barcodes')
+    .select('barcode, supplier_item_id, supplier_items(name)')
+    .eq('barcode', trimmed)
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  if (!data) return null
+  const row = data as BarcodeRow
+  return {
+    barcode: row.barcode,
+    supplierItemId: row.supplier_item_id,
+    supplierItemName: resolveName(row.supplier_items)
+  }
+}
+
+export async function listSupplierItemsForBarcode(): Promise<SupplierItemRow[]> {
+  const { data, error } = await supabaseClient.from('supplier_items').select('id, name').order('name')
+  if (error) throw new Error(error.message)
+  return (data as SupplierItemRow[]) ?? []
+}
+
+export async function assignBarcode(payload: {
+  barcode: string
+  supplierItemId: string
+  orgId?: string | null
+}): Promise<void> {
+  const orgId = payload.orgId ?? getCookieValue('chefos-active-org') ?? (await getCurrentOrgId())
+  const { error } = await supabaseClient.from('product_barcodes').insert({
+    org_id: orgId,
+    barcode: payload.barcode.trim(),
+    supplier_item_id: payload.supplierItemId
+  })
+
+  if (error) throw new Error(error.message)
+}
+
 function getStatusFromRules(expiresAt: string | null, rules: RuleRow[]): ExpiryStatus {
   if (!expiresAt || rules.length === 0) return 'ok'
   const target = new Date(expiresAt).getTime()
@@ -130,4 +189,11 @@ function getStatusFromRules(expiresAt: string | null, rules: RuleRow[]): ExpiryS
   }
 
   return status
+}
+
+async function getCurrentOrgId(): Promise<string> {
+  const { data, error } = await supabaseClient.rpc('current_org_id')
+  if (error) throw new Error(error.message)
+  if (!data) throw new Error('No hay organizacion activa')
+  return data as string
 }

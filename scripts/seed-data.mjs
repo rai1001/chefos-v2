@@ -31,6 +31,11 @@ const BATCH_IDS = [
   '88888888-0000-0000-0000-000000000013'
 ]
 const RULE_ID = '88888888-0000-0000-0000-000000000020'
+const STOCK_LEVEL_IDS = [
+  '99999999-0000-0000-0000-000000000001',
+  '99999999-0000-0000-0000-000000000002',
+  '99999999-0000-0000-0000-000000000003'
+]
 
 const supabaseAdmin = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
   auth: { persistSession: false }
@@ -248,6 +253,42 @@ async function seed() {
       { onConflict: 'id' }
     ),
     'expiry_rules'
+  )
+
+  await ensure(
+    await supabaseAdmin.from('stock_levels').upsert(
+      [
+        {
+          id: STOCK_LEVEL_IDS[0],
+          org_id: ORG_ID,
+          location_id: LOCATION_IDS[0],
+          supplier_item_id: '77777777-0000-0000-0000-000000000011',
+          on_hand: 20,
+          available_on_hand: 20,
+          consider_reservations: true
+        },
+        {
+          id: STOCK_LEVEL_IDS[1],
+          org_id: ORG_ID,
+          location_id: LOCATION_IDS[0],
+          supplier_item_id: '77777777-0000-0000-0000-000000000012',
+          on_hand: 12,
+          available_on_hand: 12,
+          consider_reservations: true
+        },
+        {
+          id: STOCK_LEVEL_IDS[2],
+          org_id: ORG_ID,
+          location_id: LOCATION_IDS[1],
+          supplier_item_id: '77777777-0000-0000-0000-000000000013',
+          on_hand: 6,
+          available_on_hand: 6,
+          consider_reservations: false
+        }
+      ],
+      { onConflict: 'id' }
+    ),
+    'stock_levels'
   )
 
   console.log('Seeded base data for E2E')

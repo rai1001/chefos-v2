@@ -32,6 +32,11 @@ export interface PurchaseOrderLine {
   unitPrice?: number | null
   roundingRule?: string | null
   packSize?: number | null
+  onHand?: number | null
+  reserved?: number | null
+  availableOnHand?: number | null
+  netToBuy?: number | null
+  roundedQty?: number | null
 }
 
 export interface PurchaseOrderDetail {

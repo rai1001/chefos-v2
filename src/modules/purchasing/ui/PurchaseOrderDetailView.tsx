@@ -96,8 +96,12 @@ export function PurchaseOrderDetailView({ orderId }: { orderId: string }) {
               <thead className="text-xs uppercase tracking-[0.3em] text-slate-500">
                 <tr>
                   <th className="py-2">Item</th>
-                  <th className="py-2">Cantidad</th>
-                  <th className="py-2">Precio</th>
+                  <th className="py-2">Need</th>
+                  <th className="py-2">On hand</th>
+                  <th className="py-2">Reservado</th>
+                  <th className="py-2">Disponible</th>
+                  <th className="py-2">Net to buy</th>
+                  <th className="py-2">Rounded</th>
                   <th className="py-2">Regla</th>
                 </tr>
               </thead>
@@ -108,9 +112,18 @@ export function PurchaseOrderDetailView({ orderId }: { orderId: string }) {
                       {line.supplierItemName ?? line.supplierItemId}
                     </td>
                     <td className="py-2">{line.requestedQty}</td>
+                    <td className="py-2">{line.onHand ?? 0}</td>
                     <td className="py-2">
-                      {line.unitPrice !== null && line.unitPrice !== undefined ? `€${line.unitPrice}` : '—'}
+                      {line.reserved ?? 0}
+                      {(line.reserved ?? 0) > 0 && (
+                        <span className="ml-2 rounded-full border border-amber-500/50 px-2 py-0.5 text-[10px] uppercase tracking-[0.3em] text-amber-200">
+                          Reserva
+                        </span>
+                      )}
                     </td>
+                    <td className="py-2">{line.availableOnHand ?? 0}</td>
+                    <td className="py-2 font-semibold text-white">{line.netToBuy ?? 0}</td>
+                    <td className="py-2">{line.roundedQty ?? 0}</td>
                     <td className="py-2">{line.roundingRule ?? 'none'}</td>
                   </tr>
                 ))}

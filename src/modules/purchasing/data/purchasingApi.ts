@@ -7,6 +7,7 @@ import {
   Supplier,
   SupplierItem
 } from '../domain/types'
+import { calculateNetToBuy, calculateRoundedQty } from '../domain/netToBuy'
 
 interface SupplierRow {
   id: string
@@ -40,6 +41,13 @@ interface PurchaseOrderLineRow {
   rounding_rule?: string | null
   pack_size?: number | null
   supplier_items?: { name: string } | { name: string }[] | null
+}
+
+interface StockLevelRow {
+  supplier_item_id: string
+  on_hand: number
+  available_on_hand: number
+  consider_reservations: boolean
 }
 
 const resolveName = (value?: { name: string } | { name: string }[] | null) =>
@@ -169,6 +177,22 @@ export async function getPurchaseOrderDetail(orderId: string): Promise<PurchaseO
   if (linesError) throw new Error(linesError.message)
 
   const orderRow = order as PurchaseOrderRow
+  const lineRows = (lines as unknown as PurchaseOrderLineRow[]) ?? []
+  const supplierItemIds = lineRows.map((row) => row.supplier_item_id)
+  const stockByItem = new Map<string, StockLevelRow>()
+
+  if (supplierItemIds.length > 0) {
+    const { data: stockLevels, error: stockError } = await supabaseClient
+      .from('stock_levels')
+      .select('supplier_item_id, on_hand, available_on_hand, consider_reservations')
+      .in('supplier_item_id', supplierItemIds)
+
+    if (stockError) throw new Error(stockError.message)
+
+    ;((stockLevels as unknown as StockLevelRow[]) ?? []).forEach((row) => {
+      stockByItem.set(row.supplier_item_id, row)
+    })
+  }
 
   return {
     id: orderRow.id,
@@ -176,16 +200,30 @@ export async function getPurchaseOrderDetail(orderId: string): Promise<PurchaseO
     totalEstimated: orderRow.total_estimated ?? null,
     supplierName: resolveName(orderRow.suppliers),
     hotelName: resolveName(orderRow.hotels),
-    lines: ((lines as unknown as PurchaseOrderLineRow[]) ?? []).map<PurchaseOrderLine>((row) => ({
-      id: row.id,
-      supplierItemId: row.supplier_item_id,
-      supplierItemName: resolveName(row.supplier_items),
-      requestedQty: row.requested_qty,
-      receivedQty: row.received_qty,
-      unitPrice: row.unit_price ?? null,
-      roundingRule: row.rounding_rule ?? null,
-      packSize: row.pack_size ?? null
-    }))
+    lines: lineRows.map<PurchaseOrderLine>((row) => {
+      const stock = stockByItem.get(row.supplier_item_id)
+      const onHand = stock?.on_hand ?? 0
+      const availableOnHand = stock?.available_on_hand ?? onHand
+      const reserved = stock?.consider_reservations ? Math.max(onHand - availableOnHand, 0) : 0
+      const netToBuy = calculateNetToBuy(row.requested_qty, availableOnHand)
+      const roundedQty = calculateRoundedQty(netToBuy, row.rounding_rule ?? 'none', row.pack_size ?? null)
+
+      return {
+        id: row.id,
+        supplierItemId: row.supplier_item_id,
+        supplierItemName: resolveName(row.supplier_items),
+        requestedQty: row.requested_qty,
+        receivedQty: row.received_qty,
+        unitPrice: row.unit_price ?? null,
+        roundingRule: row.rounding_rule ?? null,
+        packSize: row.pack_size ?? null,
+        onHand,
+        reserved,
+        availableOnHand,
+        netToBuy,
+        roundedQty
+      }
+    })
   }
 }
 

@@ -64,7 +64,7 @@ test.describe('login Guarding', () => {
     await expect(page).toHaveURL(/\/dashboard/, { timeout: 15000 })
     await expect(page.getByRole('button', { name: /cerrar sesion/i })).toBeVisible({ timeout: 15000 })
     await page.getByRole('button', { name: /cerrar sesion/i }).click()
-    await expect(page).toHaveURL(/\/login/)
+    await expect(page).toHaveURL(/\/login/, { timeout: 15000 })
   })
 
   test('creates an event and opens detail', async ({ page }) => {
@@ -125,5 +125,14 @@ test.describe('login Guarding', () => {
     await page.getByLabel('Estado').selectOption({ label: 'Pronto' })
 
     await expect(page.getByText('Harina 00')).toBeVisible({ timeout: 15000 })
+
+    const barcode = `${Date.now()}`.slice(-13)
+    await page.getByLabel('Barcode').fill(barcode)
+    await page.getByRole('button', { name: /buscar/i }).click()
+    await expect(page.getByText(/barcode no registrado/i)).toBeVisible()
+
+    await page.getByLabel('Asignar item').selectOption({ label: 'Harina 00' })
+    await page.getByRole('button', { name: /asignar/i }).click()
+    await expect(page.getByText(/barcode asignado/i)).toBeVisible()
   })
 })
