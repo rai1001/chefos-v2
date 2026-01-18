@@ -13,7 +13,7 @@ function redirectToLogin(request: NextRequest, reason?: string) {
   return NextResponse.redirect(loginUrl)
 }
 
-export async function middleware(request: NextRequest) {
+export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   if (PUBLIC_PATHS.includes(pathname)) {
